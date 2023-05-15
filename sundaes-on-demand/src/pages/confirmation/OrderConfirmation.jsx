@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import { useOrderDetails } from "../../contexts/OrderDetails";
 import axios from "axios";
 import { Button } from "react-bootstrap";
+import AlertBanner from "../../common/AlertBanner";
 
 export default function OrderConfirmation({ setOrderPhase }) {
   const { resetOrder } = useOrderDetails();
   const [orderNumber, setOrderNumber] = useState(null);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     axios
@@ -13,7 +15,9 @@ export default function OrderConfirmation({ setOrderPhase }) {
       .then((res) => {
         setOrderNumber(res.data.orderNumber);
       })
-      .catch((err) => {});
+      .catch((err) => {
+        setError(true);
+      });
   }, []);
 
   function handleClick() {
@@ -21,7 +25,13 @@ export default function OrderConfirmation({ setOrderPhase }) {
     setOrderPhase("inProgress");
   }
 
-  if (orderNumber) {
+  if (error) {
+    return (
+      <AlertBanner>
+        An unexpected error occurred. Please try again later.
+      </AlertBanner>
+    );
+  } else if (orderNumber) {
     return (
       <div style={{ textAlign: "center" }}>
         <h1>Thank You!</h1>
